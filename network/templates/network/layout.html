@@ -1,0 +1,85 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{% block title %}Social Network{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'index' %}">Network</a>
+
+        <div>
+            <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'person' user.id %}"><strong id="user">{{ user.username
+                            }}</strong></a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'following' user.id %}">Following</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="body container">
+
+        {% block header %}
+        {% endblock %}
+
+        {% block addtwit %}
+        {% endblock %}
+
+        {% if page_obj %}
+        <div class="text-center">
+            <ul class="pagination justify-content-center">
+                <li class="{% if page_obj.has_previous %} page-item {% else %} page-item disabled {% endif %}">
+                    <a class="page-link"
+                        href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% endif %}">&laquo;</a>
+                </li>
+
+                {% for i in page_obj.paginator.page_range %}
+                <li class="page-item {% if i == page_obj.number %} active {% endif %}"><a class="page-link"
+                        href="?page={{ i }}">{{ i }}</a></li>
+                {% endfor %}
+
+
+                <li class="{% if page_obj.has_next %} page-item {% else %} page-item disabled {% endif %}">
+                    <a class="page-link"
+                        href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% endif %}">&raquo;</a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        {% block body %}
+        {% endblock %}
+
+    </div>
+</body>
+
+</html>

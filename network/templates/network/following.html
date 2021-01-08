@@ -1,0 +1,35 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block header %}
+<h2>Following</h2>
+<hr>
+{% endblock %}
+
+{% block body %}
+{% for post in page_obj %}
+<div class="post">
+    <a class="userlink" href="{% url 'person' post.user.id %}"><strong>{{ post.user.username }}</strong></a>
+    <span class="time">{{ post.timestamp }}</span><br>
+    {{ post.content }}<br>
+
+    <span class="likes">
+        {% if user.is_authenticated %}
+        <i class='far fa-heart like' id="i{{ post.id }}" {% if user in post.likes.all %}style="color:Blue;" {% else
+            %}style="color:Red;" {% endif %}></i>
+        {% else %}
+        <i class='far fa-heart'></i>
+        {% endif %}
+
+        <span id="likes{{ post.id }}">
+            {% if post.likes.count > 0 %}
+            {{ post.likes.count }}
+            {% endif %}
+        </span>
+    </span>
+</div>
+<hr>
+{% endfor %}
+
+<script src="{% static 'network/post.js' %}"></script>
+{% endblock %}

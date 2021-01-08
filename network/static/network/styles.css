@@ -1,0 +1,24 @@
+.like {
+	cursor: pointer;
+}
+
+#fol {color:gray;}
+
+#followers {margin-right: 10px;}
+
+.userlink {margin-right: 10px;}
+
+.editbtn {float: right;}
+
+.time {color:gray;}
+
+.likes {margin-left:20px; padding-top:20px;}
+
+.post {min-height:50px;}
+
+@media (min-width: 768px) {
+	.container {width: 60%;}
+}
+
+.postbtn {margin:3px;}
+
