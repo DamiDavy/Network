@@ -41,14 +41,19 @@ def follow(request, fel, fol):
         fella.followers.add(follower)
     return HttpResponseRedirect(reverse("person", args=(fel,)))
 
+@csrf_exempt
 @login_required
-def edit(request, num, fel):
-    if request.method == "POST":
-        content = request.POST["edit"]
+def edit(request):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        num = data.get("id")
+        content = data.get("text")
         post = Post.objects.get(pk=num)
         post.content = content
         post.save()
-        return HttpResponseRedirect(reverse("person", args=(fel,)))
+        return JsonResponse(post.serialize(), status=204)
+    else:
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
 
 @login_required
 def following(request, num):
@@ -66,7 +71,7 @@ def following(request, num):
                     "page_number": page_number
                     })
 
-@csrf_exempt
+# @csrf_exempt
 @login_required
 def compose(request):
     if request.method == "POST":
@@ -75,32 +80,29 @@ def compose(request):
         post = Post(user=user, content=content)
         post.save()
         return HttpResponseRedirect(reverse("index"))
-
+    else:
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
 
 @csrf_exempt
 @login_required
-def like(request, n):
-
-    try:
-        post = Post.objects.get(pk=n)
-    except Post.DoesNotExist:
-        return JsonResponse({"error": "Post not found."}, status=404)
-
-    if request.method == "GET":
-        return JsonResponse(post.serialize())
-
-    elif request.method == "PUT":
+def like(request):
+    if request.method == "PUT":
         data = json.loads(request.body)
-        if data.get("likes"):
-            person = User.objects.get(username=request.user.username)
-            if person in post.likes.all():
-                post.likes.remove(person)
-                post.save()
-                return HttpResponse(status=204)
-            else:
-                post.likes.add(person)
-                post.save()
-                return HttpResponse(status=204)
+        num = data.get("id")
+        post = Post.objects.get(pk=num)
+
+        person = User.objects.get(username=request.user.username)
+
+        if person in post.likes.all():
+            post.likes.remove(person)
+            post.save()
+            return JsonResponse(data={"message": "Like is removed"}, status=204)
+        else:
+            post.likes.add(person)
+            post.save()
+            return JsonResponse(data={"message": "Like is added"}, status=200)
+    else:
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
 
 
 def login_view(request):

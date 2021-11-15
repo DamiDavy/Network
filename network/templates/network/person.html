@@ -2,73 +2,93 @@
 {% load static %}
 
 {% block header %}
-<h2>{{ person.username }}</h2>
-<p id="fol"><span id="followers">Followers: {{ person.followers.count }}</span> Following: {{ person.following.count }}
-</p>
-{% if user.is_authenticated %}
-{% if person.username != user.username %}
-{% if user in person.followers.all %}
-<a href="{% url 'follow' person.id user.id %}">Unfollow</a>
-{% else %}
-<a href="{% url 'follow' person.id user.id %}">Follow</a>
-{% endif %}
-{% endif %}
-{% endif %}
+    <h2>{{ person.username }}</h2>
+    <p id="fol">
+        <span id="followers">Followers: {{ person.followers.count }}</span>
+        <span>Following: {{ person.following.count }}</span>
+    </p>
+    {% if user.is_authenticated %}
+        {% if person.username != user.username %}
+            {% if user in person.followers.all %}
+                <a href="{% url 'follow' person.id user.id %}">Unfollow</a>
+            {% else %}
+                <a href="{% url 'follow' person.id user.id %}">Follow</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block addtwit %}
-{% if user.is_authenticated and user.username == person.username %}
-<div id="new-post">
-    <h5>New Post</h5>
-    <form id="compose-form" action="{% url 'compose' %}" method="post">
-        {% csrf_token %}
-        <textarea name="post" class="form-control area" id="compose-body" rows="2"></textarea>
-        <input type="submit" class="btn btn-primary postbtn" value="Post">
-    </form>
-</div>
-{% endif %}
-<hr>
+    {% if user.is_authenticated and user.username == person.username %}
+        <div id="new-post">
+            <h5>New Post</h5>
+            <form id="compose-form" action="{% url 'compose' %}" method="post">
+                {% csrf_token %}
+                <textarea name="post" class="form-control area" id="compose-body" rows="2">
+                </textarea>
+                <input type="submit" class="btn btn-primary postbtn" value="Post">
+            </form>
+        </div>
+    {% endif %}
+    <hr>
 {% endblock %}
 
 {% block body %}
 
-{% for post in page_obj %}
-<div class="post">
-    <a class="userlink" href="{% url 'person' post.user.id %}"><strong>{{ post.user.username }}</strong></a>
-    <span class="time">{{ post.timestamp }}</span>
+    {% for post in page_obj %}
+        <div class="post">
+            <a class="userlink" href="{% url 'person' post.user.id %}">
+                <strong>{{ post.user.username }}</strong>
+            </a>
+            <span class="time">{{ post.timestamp }}</span>
 
-    {% if post.user.username == user.username %}
-    <button class="editbtn btn btn-outline-primary" id="b{{ post.id }}">Edit</button><br>
-    {% endif %}
-
-    {{ post.content }}<br>
-
-    <span class="likes">
-        {% if user.is_authenticated %}
-        <i class='far fa-heart like' id="i{{ post.id }}" {% if user in post.likes.all %}style="color:Blue;" {% else
-            %}style="color:Red;" {% endif %}></i>
-        {% else %}
-        <i class='far fa-heart'></i>
-        {% endif %}
-
-        <span id="likes{{ post.id }}">
-            {% if post.likes.count > 0 %}
-            {{ post.likes.count }}
+            {% if post.user.username == user.username %}
+                <button class="editbtn btn btn-outline-primary" id="e{{ post.id }}">Edit</button>
             {% endif %}
-        </span>
-    </span>
-</div>
 
-<div class="edit" id="edit{{ post.id }}">
-    <form id="compose-form" action="{% url 'edit' post.id user.id %}" method="post">
-        {% csrf_token %}
-        <textarea name="edit" class="form-control area" id="compose-body" rows="2">{{ post.content }}</textarea><br>
-        <input type="submit" class="btn btn-primary" value="Save">
-    </form>
-</div>
+            <div className="post-content" id="post-content{{ post.id }}">{{ post.content }}</div>
 
-<hr>
-{% endfor %}
+            {% if user.is_authenticated %}
+                <div class="edit" id="edit-content{{ post.id }}" style="display:none;">
+                    <form>
+                        <textarea name="edit" class="form-control area" 
+                            id="new-message-text{{ post.id }}" rows="2">{{ post.content }}</textarea>
+                        <button type="button" 
+                        class="save-cansel-btns confirm-edit-btn btn btn-primary" 
+                        id="s{{ post.id }}">
+                            Save
+                        </button>
+                        <button type="button" 
+                        class="save-cansel-btns cansel-edit-btn btn btn-primary" 
+                        id="c{{ post.id }}">
+                            Cansel
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
 
-<script src="{% static 'network/post.js' %}"></script>
+
+            <div class="d-flex justify-content-center">
+                {% if user.is_authenticated %}
+                    <button class="likes">
+                        <i class="bi bi-suit-heart-fill" id="l{{ post.id }}" 
+                        {% if user in post.likes.all %}
+                            style="color: rgb(255, 0, 98);"
+                        {% else %}
+                            style="color: gray;"
+                        {% endif %}
+                        ></i>
+                    </button>
+                {% else %}
+                    <i class="bi bi-suit-heart"></i>
+                {% endif %}
+        
+
+                <div id="likes{{ post.id }}" class="likes-num">
+                    {{ post.likes.count }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <script src="{% static 'network/post.js' %}"></script>
 {% endblock %}

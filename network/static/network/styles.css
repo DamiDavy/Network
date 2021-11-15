@@ -2,23 +2,52 @@
 	cursor: pointer;
 }
 
-#fol {color:gray;}
-
-#followers {margin-right: 10px;}
-
-.userlink {margin-right: 10px;}
-
-.editbtn {float: right;}
-
-.time {color:gray;}
-
-.likes {margin-left:20px; padding-top:20px;}
-
-.post {min-height:50px;}
-
-@media (min-width: 768px) {
-	.container {width: 60%;}
+#fol {
+	color: gray;
 }
 
-.postbtn {margin:3px;}
+#followers {
+	margin-right: 10px;
+}
 
+.userlink {
+	margin-right: 10px;
+}
+
+.editbtn {
+	float: right;
+}
+
+.save-cansel-btns {
+	display: inline-block;
+	margin: 2px auto;
+}
+
+.time {
+	color: gray;
+}
+
+.likes, .likes-num {
+	display: block;
+	border: none;
+	padding: 5px;
+	cursor: pointer;
+	width: 1.5rem;
+	background-color: white;
+	margin: 0px;
+}
+
+.post { 
+	min-height: 50px;
+	border-bottom: 1px solid rgb(189, 187, 187);
+}
+
+@media (min-width: 768px) {
+	.container {
+		width: 60%;
+	}
+}
+
+.postbtn {
+	margin:3px;
+}

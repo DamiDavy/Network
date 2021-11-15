@@ -1,49 +1,69 @@
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.edit').forEach(function (div) {
-    div.style.display = 'none';
-  })
 
   document.addEventListener('click', event => {
     const element = event.target;
+    const classList = element.classList;
 
-    if (element.classList.contains("editbtn")) {
-      document.querySelectorAll('.post').forEach(function (div) {
-        div.style.display = 'block';
-      })
-      element.parentElement.style.display = 'none';
-
-      const num = element.id.slice(1);
-      document.querySelectorAll('.edit').forEach(function (div) {
-        div.style.display = 'none';
-      })
-      document.querySelector(`#edit${num}`).style.display = 'block';
+    //editing post
+    //hide post text, show textarea
+    if (classList.contains("editbtn")) {
+      const postId = element.id.slice(1);
+      element.style.visibility = 'hidden';
+      document.querySelector(`#post-content${postId}`).style.display = 'none';
+      document.querySelector(`#edit-content${postId}`).style.display = 'block';
     }
-  })
 
+    //cansel editing
+    else if (classList.contains("cansel-edit-btn")) {
+      const postId = element.id.slice(1);
+      showPost(postId);
+    }
 
-  document.querySelectorAll('.like').forEach(function (a) {
-    a.addEventListener('click', () => {
-      const n = a.id.slice(1);
-      const user = document.querySelector('#user').innerHTML;
-      fetch(`/like/${n}`, {
+    //confirm editing, save new post content
+    else if (classList.contains("confirm-edit-btn")) {
+      const domain = window.location.origin
+      const postId = element.id.slice(1);
+      const newText = document.querySelector(`#new-message-text${postId}`).value;
+      fetch(`${domain}/edit`, {
         method: 'PUT',
         body: JSON.stringify({
-          likes: "action"
+          text: newText,
+          id: postId
         })
       })
-      fetch(`/like/${n}`)
-      .then(response => response.json())
-      .then(post => {
-        const likes = post["likes"];
-        console.log(likes);
-        document.querySelector(`#likes${n}`).innerHTML = likes.length;
-        if (likes.includes(user)) {
-          document.querySelector(`#i${n}`).style.color = 'Blue';
-        }
-        else {
-          document.querySelector(`#i${n}`).style.color = 'Red';
-        }
+        .then(() => {
+          document.querySelector(`#post-content${postId}`).innerHTML = newText;
+          showPost(postId);
+        })
+    }
+
+    //adding or deleting like
+    else if (classList.contains("bi-suit-heart-fill")) {
+      const domain = window.location.origin
+      const postId = element.id.slice(1);
+      fetch(`${domain}/like`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          id: postId
+        })
       })
-    });
+        .then((res) => {
+          const likesCount = document.querySelector(`#likes${postId}`).innerHTML;
+          if (res.status === 200) {
+            document.querySelector(`#likes${postId}`).innerHTML = +likesCount + 1;
+            document.querySelector(`#l${postId}`).style.color = 'rgb(255, 0, 98)';
+          } else {
+            document.querySelector(`#likes${postId}`).innerHTML = likesCount > 0 ? likesCount - 1 : 0;
+            document.querySelector(`#l${postId}`).style.color = 'gray';
+          }
+        })
+    }
   })
 })
+
+//hiding edit-post-form, showing post
+function showPost(postId) {
+  document.querySelector(`#e${postId}`).style.visibility = 'visible';
+  document.querySelector(`#post-content${postId}`).style.display = 'block';
+  document.querySelector(`#edit-content${postId}`).style.display = 'none';
+}

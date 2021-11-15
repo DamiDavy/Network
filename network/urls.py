@@ -10,9 +10,9 @@ urlpatterns = [
     path('user/<int:num>/', views.person, name='person'),
     path('follow/<int:fel>/<int:fol>', views.follow, name='follow'),
     path('following/<int:num>/', views.following, name='following'),
-    path('edit/<int:num>/<int:fel>/', views.edit, name='edit'),
-
-        # API Routes
     path("post", views.compose, name="compose"),
-    path("like/<int:n>", views.like, name="like"),
+
+    # API Routes
+    path("like", views.like, name="like"),
+    path('edit', views.edit, name="edit"),
 ]
